@@ -143,7 +143,6 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: secret
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      JWT_SECRET: sua-chave-secreta-muito-segura-aqui-minimo-256-bits
       JWT_EXPIRATION: 3600000
     depends_on:
       postgres-auth:
