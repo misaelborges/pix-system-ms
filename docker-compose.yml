@@ -1,55 +1,166 @@
 version: '3.8'
+
 services:
+  # ===== BANCOS DE DADOS =====
+
   postgres-auth:
     image: postgres:15
+    container_name: postgres-auth
     environment:
       POSTGRES_DB: auth_db
       POSTGRES_PASSWORD: secret
+      POSTGRES_USER: postgres
     ports:
       - "5430:5432"
+    volumes:
+      - postgres-auth-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pix-network
 
   postgres-account:
     image: postgres:15
+    container_name: postgres-account
     environment:
       POSTGRES_DB: account_db
       POSTGRES_PASSWORD: secret
+      POSTGRES_USER: postgres
     ports:
       - "5433:5432"
+    volumes:
+      - postgres-account-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pix-network
 
   postgres-pixkey:
     image: postgres:15
+    container_name: postgres-pixkey
     environment:
       POSTGRES_DB: pixkey_db
       POSTGRES_PASSWORD: secret
+      POSTGRES_USER: postgres
     ports:
       - "5434:5432"
+    volumes:
+      - postgres-pixkey-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pix-network
 
   postgres-receipt:
     image: postgres:15
+    container_name: postgres-receipt
     environment:
       POSTGRES_DB: receipt_db
       POSTGRES_PASSWORD: secret
+      POSTGRES_USER: postgres
     ports:
       - "5435:5432"
+    volumes:
+      - postgres-receipt-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pix-network
 
   mongodb:
     image: mongo:6
+    container_name: mongodb
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: secret
     ports:
       - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pix-network
 
   redis:
     image: redis:7
+    container_name: redis
     ports:
       - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pix-network
 
   rabbitmq:
     image: rabbitmq:3-management
+    container_name: rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: user
       RABBITMQ_DEFAULT_PASS: password
     ports:
       - "5672:5672"
       - "15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pix-network
+
+  # ===== MICROSSERVIÇOS =====
+
+  auth-service:
+    image: mizaelborges/auth-service:1.0
+    container_name: auth-service
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-auth:5432/auth_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: secret
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      JWT_SECRET: sua-chave-secreta-muito-segura-aqui-minimo-256-bits
+      JWT_EXPIRATION: 3600000
+    depends_on:
+      postgres-auth:
+        condition: service_healthy
+    networks:
+      - pix-network
+    restart: unless-stopped
+
+volumes:
+  postgres-auth-data:
+  postgres-account-data:
+  postgres-pixkey-data:
+  postgres-receipt-data:
+  mongodb-data:
+  redis-data:
+  rabbitmq-data:
+
+networks:
+  pix-network:
+    driver: bridge
