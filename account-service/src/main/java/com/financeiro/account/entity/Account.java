@@ -44,7 +44,7 @@ public class Account {
     private OffsetDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(nullable = false, name = "updatedAt")
+    @Column(nullable = false, name = "updated_at")
     private OffsetDateTime updatedAt;
 
     public Account() {

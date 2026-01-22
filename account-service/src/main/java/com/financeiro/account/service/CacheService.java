@@ -1,6 +1,5 @@
 package com.financeiro.account.service;
 
-import ch.qos.logback.classic.layout.TTLLLayout;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
