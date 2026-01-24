@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/payment-service/payment-service.iml" filepath="$PROJECT_DIR$/payment-service/payment-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/pix-system-ms.iml" filepath="$PROJECT_DIR$/.idea/pix-system-ms.iml" />
     </modules>
   </component>
