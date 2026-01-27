@@ -7,10 +7,12 @@ import com.financeiro.account.entity.dto.response.AccountResumoDTO;
 import com.financeiro.account.entity.dto.response.BalanceResponseDTO;
 import com.financeiro.account.service.AccountService;
 import jakarta.validation.Valid;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -58,5 +60,17 @@ public class AccountController {
     public ResponseEntity<Boolean> validateAccountExists(@PathVariable Long accountId) {
         boolean validateAccountExists = accountService.validateAccountExists(accountId);
         return ResponseEntity.status(HttpStatus.OK).body(validateAccountExists);
+    }
+
+    @PutMapping("/accounts/internal/{accountId}/debit")
+    public ResponseEntity<?> debit(@PathVariable Long accountId, @RequestParam BigDecimal amount) {
+        accountService.debit(accountId, amount);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PutMapping("/accounts/internal/{accountId}/credit")
+    public ResponseEntity<?> credit(@PathVariable Long accountId, @RequestParam BigDecimal amount) {
+        accountService.credit(accountId, amount);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
