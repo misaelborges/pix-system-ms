@@ -1,4 +1,4 @@
-package com.financeiro.payment.config.messaging.rabbitmq;
+package com.financeiro.payment.config.rabbitmq;
 
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;

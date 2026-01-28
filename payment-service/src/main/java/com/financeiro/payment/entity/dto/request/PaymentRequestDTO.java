@@ -6,14 +6,14 @@ import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 
 public record PaymentRequestDTO(
-        @NotNull(message = "")
+        @NotNull(message = "Conta de origem deve ser informada")
         Long senderAccountId,
 
-        @NotNull(message = "Chave PIX deve ser informado")
+        @NotNull(message = "Chave PIX deve ser informada")
         String pixKeyReceiver,
 
-        @Positive(message = "Valor da transferencia deve ser positivo")
         @NotNull(message = "Valor não pode ser vazio")
+        @Positive(message = "Valor da transferência deve ser positivo")
         BigDecimal amount,
 
         String description
