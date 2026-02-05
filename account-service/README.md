@@ -347,7 +347,7 @@ ou
 false
 ```
 
-**Nota:** Este endpoint é protegido para uso interno apenas (entre serviços).
+**Nota:** Este endpoint é destinado ao uso interno por outros microserviços.
 
 ---
 
@@ -387,7 +387,7 @@ account.credit(BigDecimal.valueOf(100.00));
 
 ---
 
-## 🔒 Segurança e Validações
+## Validações
 
 ### Validações de Entrada
 
@@ -712,13 +712,6 @@ mvn clean install
 ---
 
 ## 📞 Integração com Outros Serviços
-
-### Auth Service
-O Account Service pode validar tokens via Auth Service:
-
-```http
-POST /api/v1/auth/validate?token=eyJ...
-```
 
 ### Transaction Service
 O Transaction Service chama:
