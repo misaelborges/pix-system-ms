@@ -133,24 +133,6 @@ services:
 
   # ===== MICROSSERVIÇOS =====
 
-  auth-service:
-    image: mizaelborges/auth-service:1.0
-    container_name: auth-service
-    ports:
-      - "8080:8080"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-auth:5432/auth_db
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: secret
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      JWT_EXPIRATION: 3600000
-    depends_on:
-      postgres-auth:
-        condition: service_healthy
-    networks:
-      - pix-network
-    restart: unless-stopped
-
 volumes:
   postgres-auth-data:
   postgres-account-data:

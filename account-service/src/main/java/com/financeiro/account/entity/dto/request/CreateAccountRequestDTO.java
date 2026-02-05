@@ -6,6 +6,9 @@ import jakarta.validation.constraints.Pattern;
 import org.hibernate.validator.constraints.br.CPF;
 
 public record CreateAccountRequestDTO(
+        @NotNull(message = "Usuário é obrigatório")
+        Long userId,
+
         @Email(message = "Formato de email inválido")
         @NotNull(message = "Email é obrigatório")
         String email,
