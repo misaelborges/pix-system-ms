@@ -1,4 +1,4 @@
-package com.financeiro.account.exception.hendler;
+package com.financeiro.account.exception.validation;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-@Data
+@Data//nao usa isso aqui
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
