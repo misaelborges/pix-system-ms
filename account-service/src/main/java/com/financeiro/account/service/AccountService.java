@@ -2,14 +2,15 @@ package com.financeiro.account.service;
 
 import com.financeiro.account.config.mapper.AccountMapper;
 import com.financeiro.account.entity.Account;
-import com.financeiro.account.entity.dto.request.CreateAccountRequestDTO;
 import com.financeiro.account.entity.dto.request.UpdateAccountRequestDTO;
 import com.financeiro.account.entity.dto.response.AccountResponseDTO;
 import com.financeiro.account.entity.dto.response.AccountResumoDTO;
 import com.financeiro.account.entity.dto.response.BalanceResponseDTO;
-import com.financeiro.account.exception.AccountNotFoundException;
-import com.financeiro.account.exception.CpfAlreadyExistsException;
-import com.financeiro.account.exception.EmailAlreadyExistsException;
+import com.financeiro.account.exception.account.AccountCreationException;
+import com.financeiro.account.exception.account.AccountNotFoundException;
+import com.financeiro.account.exception.BusinessException;
+import com.financeiro.account.exception.validation.CpfAlreadyExistsException;
+import com.financeiro.account.exception.validation.EmailAlreadyExistsException;
 import com.financeiro.account.repository.AccountRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -33,19 +34,18 @@ public class AccountService {
     }
 
     @Transactional
-    public AccountResponseDTO create(CreateAccountRequestDTO createAccountRequestDTO) {
-        if (accountRepository.existsByEmail(createAccountRequestDTO.email())) {
-            throw new EmailAlreadyExistsException("Esse email já esta em uso");
-        }
+    public Account create(Account account) {
+        try {
+            validateEmailUniqueness(account.getEmail());
+            validateCpfUniqueness(account.getCpf());
 
-        if (accountRepository.existsByCpf(createAccountRequestDTO.cpf())) {
-            throw new CpfAlreadyExistsException("Esse email já esta em uso");
-        }
+            return saveAccount(account);
 
-        Account account = accountMapper.toEntity(createAccountRequestDTO);
-        account.setAccountNumber(account.generateAccountNumber());
-        account = accountRepository.save(account);
-        return accountMapper.toResponseDTO(account);
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new AccountCreationException("Erro ao criar conta: " + e.getMessage(), e);
+        }
     }
 
     public AccountResponseDTO findAccountById(Long accountId) {
@@ -115,12 +115,28 @@ public class AccountService {
         cacheService.cacheBalance(account.getId(), account.getBalance());
     }
 
-    public boolean validateAccountExists(Long accountId) {
+    public boolean validateAccountExists(Long accountId) {//isso aqui é outra service
         Optional<Account> account = accountRepository.findById(accountId);
-        if (account.isEmpty()) {
-            return false;
+        return account.isPresent();
+    }
+
+
+    private void validateEmailUniqueness(String email) {
+        if (accountRepository.existsByEmail(email)) {
+            throw new EmailAlreadyExistsException("Esse email já esta em uso");
         }
-        return true;
+    }
+
+    private void validateCpfUniqueness(String cpf) {
+        if (accountRepository.existsByCpf(cpf)) {
+            throw new CpfAlreadyExistsException("Esse CPF já esta em uso");
+        }
+    }
+
+    private Account saveAccount(Account account) {
+        account.setAccountNumber(account.generateAccountNumber());
+        account = accountRepository.save(account);
+        return account;
     }
 
 }
